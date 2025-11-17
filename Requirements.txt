@@ -1,0 +1,5 @@
+Anthropic 
+n8n
+google sheets
+tavily
+linkedin account
