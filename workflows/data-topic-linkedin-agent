@@ -1,0 +1,1097 @@
+{
+  "name": "Linkedin Content",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "67afc373-4407-4c92-8355-955ea1e307ed",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "To do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        0
+      ],
+      "id": "56069256-ed42-4a9b-847d-bff1b43d68fe",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search the web for {{ $json.Topic }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"start_date\": \"2025-02-09\",\n  \"end_date\": \"2025-12-29\",\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "1f5e42d9-8b93-4489-9424-8d5eba0a6a22",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article 1: {{ $json.results[0].content }}\nArticle 2: {{ $json.results[1].content }}\nArticle 3: {{ $json.results[2].content }}",
+        "options": {
+          "systemMessage": "=Write in the voice of Nas Duarte — an operator, accountant, productivity engineer, and AI solutions architect who is also an AI student. The tone is clear, grounded, practical, and rooted in real business experience.\n\nVOICE PROFILE:\n- Calm, grounded, compassionate.\n- Speaks like someone who runs operations, fixes broken processes, and understands how money, systems, and people move through a business.\n- Accounting-forward: emphasizes cash flow, reporting hygiene, controls, and unit economics.\n- Operator-minded: focuses on repeatable systems, workflow clarity, team alignment, and the removal of friction points.\n- Productivity-driven: highlights how structure, automation, and better system design make teams faster, calmer, and more effective — without burnout.\n- AI-aware: explains how smart automation and data tools increase output, reduce manual work, and create space for better decisions.\n- Student-builder energy: curious, analytical, humble but confident; explains concepts in a simple, human, relatable way.\n- Zero hype. Zero fluff. No corporate jargon. No emojis.\n\nYou will be given:\n\narticle_1: {title, source, date, summary|full_text}\narticle_2: {title, source, date, summary|full_text}\nai_search_article_3: {AI search results relevant to topic}\nOBJECTIVE:\nUsing the topic and research provided, write a LinkedIn post that translates the insight into something valuable for CEOs, operators, and founders. Show how strong accounting systems, disciplined operations, and AI-powered productivity workflows help companies grow with less stress and more clarity.\nSTRICT FORMATTING: Your job is to merge these three inputs into one concise, professional LinkedIn post following the exact structure below.\n\n1.\tHook(1 Sentence) A sharp thesis reflecting the shared signal across Article 1, Article 2, and the AI search findings. Short, declarative, and insight-heavy.\n2.\tInsight Block (4-5 sentences) Start with one strong thesis line about the topic.\nBlend all three sources into a unified synthesis.\na.\tFollow with 2–3 sentences connecting the insight to accounting, operations, AI, and productivity\nStyle Rules \n•\t90–140 words.\n• Short, clean sentences.\n• No emojis, no questions, no meta-talk (“these articles say”).\n\n•. Must be original (no copying text)\n• Include one line that positions Nas as someone who helps CEOs strengthen systems, improve reporting, and scale productivity with AI.\n• End with 4–6 hashtags; last hashtag is always #NaslyDuarte.\n\nMANDATORY POSITIONING LINE (must be rephrased but included):\n“I help CEOs clean up their numbers, streamline operations, and use AI to build a more profitable business.”\n\nOUTPUT:\nOnly output the final LinkedIn post text. No explanations or bullets.\n\n4. HASHTAGS (Final Line)\n4-7 Hashtags\n#PrivateEquity #ETA #ResponsibleAI #Departments #RevenueQuality\n#CustomerRetention #OperatingLeverage #AISolutionArchitect\n\nGRAMMAR COMPLIANCE (MANDATORY):\n• Every sentence must be complete and end with a period.\n• No run-ons, no fragments, no double ideas in one sentence.\n• Use clear subject–verb structure.\n• Keep sentences 8–18 words when possible.\n• Use commas only where grammatically necessary.\n• If the AI produces a sentence that sounds confusing, restructure it for clarity.\n• Final output must read like professionally edited writing.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d426d5a5-1cbe-4456-9eaf-abc0e71004be",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        208
+      ],
+      "id": "e8115ba2-1b6a-4496-b8c6-886e6c055b83",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "YykNCqah2yZhTBwF",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "71677721",
+        "text": "={{ $json.Topic }}{{ $json.Content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "603204b1-c87f-4559-a49b-ac46a5409577",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "hxW2Nifjq2n3VPGT",
+          "name": "LinkedIn account 3"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet').item.json.Topic }}",
+            "Status": "={{ $('Get row(s) in sheet').item.json.Status }}",
+            "Content": "={{ $('AI Agent').item.json.output }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Status"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1584,
+        0
+      ],
+      "id": "74f32f0f-02ef-4870-b71d-ce216ddb498c",
+      "name": "Update row Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet').item.json.Topic }}",
+            "Status": "={{ $('Get row(s) in sheet').item.json.Status }}",
+            "Content": "={{ $json.output }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        0
+      ],
+      "id": "c136d794-c9d4-4610-849e-1962cf960e6f",
+      "name": "Update row Topic",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1444432884,
+          "mode": "list",
+          "cachedResultName": "Think Like A Healer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=1444432884"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "urn",
+              "displayName": "urn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1392,
+        0
+      ],
+      "id": "a6aac6f8-6a58-4243-b6c6-8b69eb0f5890",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        1008
+      ],
+      "id": "431b165c-0f0f-47ad-a532-c61932a73a38",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1444432884,
+          "mode": "list",
+          "cachedResultName": "Think Like A Healer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=1444432884"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "To do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        320,
+        1008
+      ],
+      "id": "ff33e176-0cff-4034-b062-0fe43d33ae03",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search the web for {{ $json.Topic }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"start_date\": \"2025-02-09\",\n  \"end_date\": \"2025-12-29\",\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        1008
+      ],
+      "id": "f0fd0e8a-358f-4203-ab1d-0abf28a5b5e6",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article 1: {{ $json.results[0].content }}\nArticle 2: {{ $json.results[1].content }}\nArticle 3: {{ $json.results[2].content }}",
+        "options": {
+          "systemMessage": "=Write in the voice of Nas Duarte — a health advocate, ai student, bloodwork specialist, AI wellness builder, and founder of Think Like a Healer. The tone is calm, grounded, compassionate, and rooted in practical scientific healing wisdom.\n\nVOICE PROFILE:\n- Calm, grounded, compassionate.\n- Explains biology and lab patterns in simple language.\n- Connects healing to energy, focus, and long-term economic stability.\n- Encourages responsibility without blame or shame\n- Speaks like someone who studies her body, understands biomarkers, sees patterns in human behavior, and uses ancestral and scientific knowledge to empower people.\n- Healing-forward: emphasizes metabolism, nutrient density, mineral balance, hormonal clarity, gut health, recovery, and lifestyle foundations.\n- Practical wellness coach: focuses on small daily shifts, nervous system balance, body literacy, and learning how to listen to the body.\n- Data-aware: references bloodwork, optimal ranges, biology, and health-pattern insights in simple human language.\n- AI-aware: explains how smart tools can help people track symptoms, understand labs, and personalize wellness without guesswork.\n- Zero fear tactics. Zero fluff. No toxic positivity. No emojis.\n\nYou will be given:\n• article_1: {title, source, date, summary|full_text}\n• article_2: {title, source, date, summary|full_text}\n• ai_search_article_3: {AI search results relevant to the healing topic}\n\n------------------------------------------------------------\nOBJECTIVE\n------------------------------------------------------------\nUsing the topic and research provided, write a LinkedIn post that teaches people how to think about their health differently. Show how understanding biology, lab patterns, ancestral habits, and daily routines can help the body heal naturally. \n\nThe post must merge all three inputs into ONE structured piece of healing insight.\n\n------------------------------------------------------------\nENFORCED LINKEDIN POST STRUCTURE (STRICT)\n------------------------------------------------------------\n\n1. HOOK (1 sentence, stand-alone paragraph)\nA strong, simple truth about the body or healing related to the Topic. Insightful, grounded, and relatable.\n\n2. INSIGHT BLOCK (1 paragraph, 4–5 sentences)\nBlend all three research inputs into one synthesis.\nMust include:\n• human biology or metabolic insight\n• ancestral / behavioral wisdom\n• nervous system or lifestyle component\n• data-awareness (lab markers, patterns, or body signals)\n• a calm healing tone\nKeep sentences short, warm, and clear.\n\n3. POSITIONING LINE (1 sentence, stand-alone paragraph)\nRephrase and include:\n“My work at Think Like a Healer helps people understand their biology, read their labs, and rebuild their health with simple, science-backed habits.”\n\n4. HASHTAGS (final line)\n4–7 hashtags:\n#ThinkLikeAHealer #BodyLiteracy #MetabolicHealth #HolisticHealing \n#NervousSystem #RootCause #AncestralHealth \nFinal tag must always be: #NaslyDuarte\n\n------------------------------------------------------------\nSTYLE RULES\n------------------------------------------------------------\n• 90–140 words.\n• No emojis, no questions.\n• No meta-talk (no “these articles say…”).\n• ONE em dash allowed.\n• Must be original.\n• Only output the final LinkedIn post.\n\n\nGRAMMAR COMPLIANCE (MANDATORY):\n• Every sentence must be complete and end with a period.\n• No run-ons, no fragments, no double ideas in one sentence.\n• Use clear subject–verb structure.\n• Keep sentences 8–18 words when possible.\n• Use commas only where grammatically necessary.\n• If the AI produces a sentence that sounds confusing, restructure it for clarity.\n• Final output must read like professionally edited writing.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        800,
+        1008
+      ],
+      "id": "ab61441f-40ff-45a5-b7e5-96893574f971",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude 4 Sonnet"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        1216
+      ],
+      "id": "142c6ba5-3e00-4a10-a0b4-5bfc9b04f471",
+      "name": "Anthropic Chat Model1",
+      "credentials": {
+        "anthropicApi": {
+          "id": "YykNCqah2yZhTBwF",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "65429541",
+        "text": "={{ $json.Topic }}{{ $json.Content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1008
+      ],
+      "id": "ac03346e-465e-481e-a00a-c4af9f1e9e55",
+      "name": "Create a post1",
+      "": {
+        "linkedInOAuth2Api": {
+          "id": "TbmC9Lij6mutiUIS",
+          "name": "LinkedIn account 4"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1444432884,
+          "mode": "list",
+          "cachedResultName": "Think Like A Healer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=1444432884"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet1').item.json.Topic }}",
+            "Status": "={{ $('Get row(s) in sheet1').item.json.Status }}",
+            "Content": "={{ $('AI Agent1').item.json.output }}",
+            "row_number": 0
+          },
+          "matchingColumns": [
+            "Status"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1760,
+        1008
+      ],
+      "id": "0431ffba-d972-4732-a2a8-1424ec4d86d8",
+      "name": "Update row Status1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1444432884,
+          "mode": "list",
+          "cachedResultName": "Think Like A Healer",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=1444432884"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Get row(s) in sheet1').item.json.Topic }}",
+            "Status": "={{ $('Get row(s) in sheet1').item.json.Status }}",
+            "Content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "urn",
+              "displayName": "urn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1152,
+        1008
+      ],
+      "id": "7fe41aba-4472-439a-8560-b179bc2e630b",
+      "name": "Update row Topic1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw",
+          "mode": "list",
+          "cachedResultName": "Linkedin Content ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ql36fRU81J_vy-RsMLv6jL5bN0AXg_OonLOBxjKJvCw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Get row(s) in sheet1').item.json.row_number }}",
+            "Status": "Created"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "urn",
+              "displayName": "urn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        1008
+      ],
+      "id": "05e1f4af-ab61-4ee8-b996-e730a4f69fee",
+      "name": "Update row in sheet1",
+      "": {
+        "googleSheetsOAuth2Api": {
+          "id": "XlvrdV3X8DaAkvhE",
+          "name": "Linkedin Content Daily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Mindfull Dollar \n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 368,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "b9f7de69-872b-4f38-abe3-25805580027b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Think Like a Healer Content ",
+        "height": 320,
+        "width": 592
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        896
+      ],
+      "typeVersion": 1,
+      "id": "7f6549fd-00f7-4f0e-b4b2-ba2a54d8bd09",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update row Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row Topic": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Update row Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Update row Topic1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row Topic1": {
+      "main": [
+        [
+          {
+            "node": "Create a post1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Update row Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a3a7bd9b-6f94-451a-b5c4-c955362d8736",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "73ccad51535c4d326674d7e192393f57a66c1bf4683488e9ccbf4478bcd75a4e"
+  },
+  "id": "Ci4ar8XTZvuQX7RF",
+  "tags": []
+}
